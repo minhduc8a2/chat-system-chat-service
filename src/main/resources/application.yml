@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: chat-service
+  #   config:
+  # import: optional:configserver:http://localhost:8080
+  cloud:
+    config:
+      enabled: false
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+kafka-config:
+  topic-name: chat-messages
+  partitions: 3
+  replicas: 1
+
+server:
+  port: 8084
