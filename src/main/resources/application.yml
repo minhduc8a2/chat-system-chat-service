@@ -9,8 +9,8 @@ spring:
   kafka:
     producer:
       bootstrap-servers: localhost:9092
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+     
+      
 
 kafka-config:
   topic-name: chat-messages
@@ -19,3 +19,9 @@ kafka-config:
 
 server:
   port: 8084
+
+jwt:
+  secret: X0iDLiUGr5em1s0hWKnZCMdJ+irvhURKSo1faNKpGxY=
+  expiration-time: 900000
+  refresh-token:
+    expiration-time: 604800000

@@ -11,12 +11,16 @@ import jakarta.validation.constraints.NotNull;
 
 public record MessageDTO(
 
-                Long senderId,
-                @NotNull @Min(1) Long roomId,
-                @NotBlank String content,
-                MessageType type,
-                Instant timestamp
+        Long senderId,
+        @NotNull @Min(1) Long roomId,
+        @NotBlank String content,
+        @NotNull MessageType type,
+        Instant timestamp
 
 ) implements Serializable {
+
+    public MessageDTO(String message) {
+        this(null, null, message, MessageType.SYSTEM, Instant.now());
+    }
 
 }
