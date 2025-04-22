@@ -17,9 +17,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
-
-     
-      
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  cache:
+    type: redis
+  
 
 kafka-config:
   topic-name: chat-messages
@@ -34,3 +38,8 @@ jwt:
   expiration-time: 900000
   refresh-token:
     expiration-time: 604800000
+
+api:
+  version: v1
+  base-url: /api/${api.version}
+  chat-rooms: /${api.base-url}/chat-rooms
