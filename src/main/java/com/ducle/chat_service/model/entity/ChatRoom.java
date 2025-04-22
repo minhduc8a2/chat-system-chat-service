@@ -45,11 +45,11 @@ public class ChatRoom {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ChatRoomType type; 
+    private ChatRoomType type = ChatRoomType.PUBLIC; 
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ChatRoomStatus status; 
+    private ChatRoomStatus status = ChatRoomStatus.ACTIVE; 
 
   
 

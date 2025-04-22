@@ -11,7 +11,6 @@ import com.ducle.chat_service.exception.AccessDeniedException;
 import com.ducle.chat_service.exception.WebSocketExceptionHandler;
 import com.ducle.chat_service.model.dto.ClientMessageDTO;
 import com.ducle.chat_service.model.dto.ErrorDTO;
-import com.ducle.chat_service.model.dto.MessageDTO;
 import com.ducle.chat_service.service.MessageService;
 
 import jakarta.validation.Valid;

@@ -11,6 +11,7 @@ import com.ducle.chat_service.model.dto.ChatRoomDTO;
 import com.ducle.chat_service.model.entity.ChatRoom;
 import com.ducle.chat_service.model.entity.ChatRoomMember;
 import com.ducle.chat_service.model.enums.ChatRoomMemberRole;
+import com.ducle.chat_service.model.enums.ChatRoomStatus;
 import com.ducle.chat_service.repository.ChatRoomMemberRepository;
 import com.ducle.chat_service.repository.ChatRoomRepository;
 
