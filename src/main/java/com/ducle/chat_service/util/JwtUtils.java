@@ -1,6 +1,5 @@
 package com.ducle.chat_service.util;
 
-
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -46,6 +45,15 @@ public class JwtUtils {
             return claims.get("roles", List.class);
         } catch (Exception e) {
             return Collections.emptyList();
+        }
+    }
+
+    public Long extractUserId(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+            return claims.get("userId", Long.class);
+        } catch (Exception e) {
+            return null;
         }
     }
 

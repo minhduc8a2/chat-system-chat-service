@@ -1,16 +1,18 @@
 package com.ducle.chat_service.controller;
 
-import java.nio.file.AccessDeniedException;
-
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
+import com.ducle.chat_service.exception.AccessDeniedException;
+import com.ducle.chat_service.exception.WebSocketExceptionHandler;
+import com.ducle.chat_service.model.dto.ClientMessageDTO;
+import com.ducle.chat_service.model.dto.ErrorDTO;
 import com.ducle.chat_service.model.dto.MessageDTO;
-import com.ducle.chat_service.service.queue_service.QueueService;
+import com.ducle.chat_service.service.MessageService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,21 +22,26 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class MessageController {
-    private final QueueService queueService;
 
-    private final SimpMessagingTemplate messagingTemplate;
+    private final MessageService messageService;
+    private final WebSocketExceptionHandler exceptionHandler;
 
     @MessageMapping("/chat.send/{chatroomId}")
-    public void sendMessageToChatroom(@DestinationVariable String chatroomId, @Valid MessageDTO message,
+    public void sendMessageToChatroom(@DestinationVariable Long chatroomId, @Valid ClientMessageDTO message,
             Message<?> fullMessage) {
-        SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.wrap(fullMessage);
-        String username = (String) accessor.getSessionAttributes().get("username");
-        log.info(username + " send message to chatroom " + chatroomId + ": " + message.content());
-        // if (!userHasAccessToRoom(username, chatroomId)) {
-        //     throw new AccessDeniedException("User not allowed to chat in this room");
-        // }
-        queueService.sendMessage(message);
-        messagingTemplate.convertAndSend("/topic/chatRoom/" + chatroomId, message);
+        messageService.sendMessageToChatroom(chatroomId, message, fullMessage);
+    }
+
+    @MessageExceptionHandler(AccessDeniedException.class)
+    @SendToUser("/queue/errors")
+    public ErrorDTO handleAccessDenied(AccessDeniedException ex) {
+        return exceptionHandler.handleAccessDeniedException(ex);
+    }
+
+    @MessageExceptionHandler(Exception.class)
+    @SendToUser("/queue/errors")
+    public ErrorDTO handleAny(Exception ex) {
+        return exceptionHandler.handleGeneralException(ex);
     }
 
 }

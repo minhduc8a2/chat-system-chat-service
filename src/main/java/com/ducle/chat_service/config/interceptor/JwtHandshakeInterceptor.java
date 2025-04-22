@@ -30,7 +30,6 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
             WebSocketHandler wsHandler,
             Map<String, Object> attributes) throws Exception {
 
-      
         String token = extractToken(request); // from query or headers
         if (token == null || !jwtUtils.isTokenValid(token)) {
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -39,13 +38,14 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
         attributes.put("username", jwtUtils.extractUsername(token));
         attributes.put("roles", jwtUtils.extractRoles(token));
+        attributes.put("userId", jwtUtils.extractUserId(token));
 
         return true;
     }
 
     private String extractToken(ServerHttpRequest request) {
         String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        
+
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             return authHeader.substring(7);
         }

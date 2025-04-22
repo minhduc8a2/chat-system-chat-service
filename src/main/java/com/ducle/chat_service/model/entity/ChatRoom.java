@@ -2,7 +2,6 @@ package com.ducle.chat_service.model.entity;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;

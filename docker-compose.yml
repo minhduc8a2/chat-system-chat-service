@@ -1,0 +1,14 @@
+services:
+  postgres:
+    container_name: chat_service_postgres
+    ports:
+      - 5435:5432
+    image: postgres:latest
+    volumes:
+      - chat_service_postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: minhduc8a2
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: chat_service_db
+volumes:
+  chat_service_postgres_data:

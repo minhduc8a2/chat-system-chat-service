@@ -9,6 +9,15 @@ spring:
   kafka:
     producer:
       bootstrap-servers: localhost:9092
+
+  datasource:
+    url: jdbc:postgresql://localhost:5435/chat_service_db
+    username: minhduc8a2
+    password: 123456
+  jpa:
+    hibernate:
+      ddl-auto: create
+
      
       
 

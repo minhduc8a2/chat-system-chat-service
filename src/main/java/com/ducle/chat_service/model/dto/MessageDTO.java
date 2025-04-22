@@ -23,4 +23,8 @@ public record MessageDTO(
         this(null, null, message, MessageType.SYSTEM, Instant.now());
     }
 
+    
+
+   
+
 }
