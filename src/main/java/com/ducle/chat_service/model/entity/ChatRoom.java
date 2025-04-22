@@ -41,7 +41,7 @@ public class ChatRoom {
     private String description;
 
     @Column(nullable = false)
-    private String ownerId;
+    private Long ownerId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -51,8 +51,7 @@ public class ChatRoom {
     @Column(nullable = false)
     private ChatRoomStatus status; 
 
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ChatRoomManager> managers = new ArrayList<>();
+  
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatRoomMember> users = new ArrayList<>();
