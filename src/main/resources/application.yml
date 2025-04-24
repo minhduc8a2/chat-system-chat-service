@@ -32,6 +32,7 @@ kafka-config:
 
 server:
   port: 8084
+  id: 0
 
 jwt:
   secret: X0iDLiUGr5em1s0hWKnZCMdJ+irvhURKSo1faNKpGxY=
@@ -52,3 +53,6 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
   instance:
     prefer-ip-address: true
+
+presence:
+  redis-key-format: "presence:server:%s:user:%s"

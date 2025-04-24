@@ -1,19 +1,25 @@
 package com.ducle.chat_service.security;
 
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
-import com.ducle.chat_service.repository.ChatRoomMemberRepository;
+import com.ducle.chat_service.exception.AccessDeniedException;
+import com.ducle.chat_service.util.SessionUtils;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class ChatRoomSecurity {
-    private final ChatRoomMemberRepository chatRoomMemberRepository;
+    private final RoomAccessChecker checker;
 
-    @Cacheable(value = "room-access", key = "#memberId + '-' + #chatroomId")
-    public boolean hasAccessToRoom(Long memberId, Long chatroomId) {
-        return chatRoomMemberRepository.existsByChatRoomIdAndMemberId(chatroomId, memberId);
+    public void ensureAccessToRoom(Message<?> fullMessage, Long chatroomId) {
+
+        Long userId = SessionUtils.getUserIdFromSession(fullMessage);
+        if (!checker.hasAccess(userId, chatroomId)) {
+            throw new AccessDeniedException("User not allowed to chat in this room");
+        }
+
     }
+
 }
