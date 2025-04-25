@@ -10,6 +10,7 @@ import com.ducle.chat_service.model.dto.ClientMessageDTO;
 import com.ducle.chat_service.model.dto.MessageDTO;
 import com.ducle.chat_service.model.enums.MessageType;
 import com.ducle.chat_service.security.ChatRoomSecurity;
+import com.ducle.chat_service.service.id_generator.impl.Snowflake;
 import com.ducle.chat_service.service.queue_service.QueueService;
 import com.ducle.chat_service.util.SessionUtils;
 
@@ -21,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MessageService {
     private final QueueService queueService;
-
+    private final Snowflake snowflake;
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatRoomSecurity chatRoomSecurity;
 
@@ -32,9 +33,10 @@ public class MessageService {
 
         Long userId = SessionUtils.getUserIdFromSession(fullMessage);
 
-        MessageDTO trustedMessage = new MessageDTO(userId, chatroomId, message.content(), MessageType.GROUP,
+        MessageDTO trustedMessage = new MessageDTO(snowflake.generateId(), userId, chatroomId, message.content(),
+                MessageType.GROUP,
                 Instant.now());
+        messagingTemplate.convertAndSend("/topic/chat_room/" + chatroomId, trustedMessage);
         queueService.sendMessage(trustedMessage);
-        messagingTemplate.convertAndSend("/topic/chat_room/" + chatroomId, message);
     }
 }

@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record MessageDTO(
-
+        Long id,
         Long senderId,
         @NotNull @Min(1) Long roomId,
         @NotBlank String content,
@@ -18,13 +18,5 @@ public record MessageDTO(
         Instant timestamp
 
 ) implements Serializable {
-
-    public MessageDTO(String message) {
-        this(null, null, message, MessageType.SYSTEM, Instant.now());
-    }
-
-    
-
-   
 
 }
