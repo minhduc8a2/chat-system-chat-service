@@ -39,4 +39,11 @@ public class ChatRoomMember {
     @Column(nullable = false)
     private ChatRoomMemberRole role;
 
+    public ChatRoomMember(ChatRoom chatRoom, Long memberId, ChatRoomMemberRole role) {
+        this.id = null;
+        this.chatRoom = chatRoom;
+        this.memberId = memberId;
+        this.role = role;
+    }
+
 }

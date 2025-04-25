@@ -22,4 +22,11 @@ public class ChatRoomSecurity {
 
     }
 
+    public void ensureToGetJoinedRooms(Long id, Long userId) {
+        if (!id.equals(userId)) {
+            throw new AccessDeniedException("User not allowed to chat in this room");
+        }
+
+    }
+
 }

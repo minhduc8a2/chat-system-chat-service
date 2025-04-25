@@ -12,6 +12,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.ducle.chat_service.exception.AccessDeniedException;
+import com.ducle.chat_service.exception.EntityNotExistsException;
 import com.ducle.chat_service.mapper.ChatRoomMapper;
 import com.ducle.chat_service.model.dto.ChatRoomDTO;
 import com.ducle.chat_service.model.entity.ChatRoom;
@@ -21,6 +23,7 @@ import com.ducle.chat_service.model.enums.ChatRoomSortField;
 import com.ducle.chat_service.model.enums.ChatRoomStatus;
 import com.ducle.chat_service.repository.ChatRoomMemberRepository;
 import com.ducle.chat_service.repository.ChatRoomRepository;
+import com.ducle.chat_service.security.ChatRoomSecurity;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,6 +37,8 @@ public class ChatRoomService {
     private final ChatRoomMapper chatRoomMapper;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
 
+    private final ChatRoomSecurity chatRoomSecurity;
+
     public URI createChatRoom(Long userId, ChatRoomDTO chatRoomDTO) {
         ChatRoom chatRoom = chatRoomMapper.toChatRoom(chatRoomDTO);
         chatRoom.setOwnerId(userId);
@@ -46,6 +51,18 @@ public class ChatRoomService {
 
         return UriComponentsBuilder.fromUriString(chatRoomApiUrl + "/{id}").buildAndExpand(savedChatRoom.getId())
                 .toUri();
+    }
+
+    public void joinRoom(Long userId, Long chatRoomId) {
+        if (chatRoomMemberRepository.existsByChatRoomIdAndMemberId(chatRoomId, userId)) {
+            throw new IllegalArgumentException("User is already a member of this chat room.");
+        }
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new EntityNotExistsException("Chat room not found"));
+
+        ChatRoomMember newMember = new ChatRoomMember(chatRoom, userId, ChatRoomMemberRole.MEMBER);
+        chatRoomMemberRepository.save(newMember);
+
     }
 
     public Page<ChatRoomDTO> getChatRooms(int page, int size, String sortBy, String sortDir) {
@@ -71,5 +88,34 @@ public class ChatRoomService {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(orders));
         return chatRoomRepository.findAll(pageable).map(chatRoomMapper::toChatRoomDTO);
+    }
+
+    public Page<ChatRoomDTO> getChatRoomsForUser(Long id, Long userId, int page, int size, String sortBy,
+            String sortDir) {
+
+        chatRoomSecurity.ensureToGetJoinedRooms(id, userId);
+
+        String[] fields = sortBy.split(",");
+        String[] directions = sortDir.split(",");
+
+        if (fields.length != directions.length) {
+            throw new IllegalArgumentException("sortBy and sortDir must have the same number of elements.");
+        }
+
+        List<Sort.Order> orders = new ArrayList<>();
+        for (int i = 0; i < fields.length; i++) {
+            ChatRoomSortField sortField;
+            try {
+                sortField = ChatRoomSortField.valueOf(fields[i]); // validate each field
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid sortBy value: " + fields[i]);
+            }
+
+            Sort.Direction direction = directions[i].equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+            orders.add(new Sort.Order(direction, sortField.name()));
+        }
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(orders));
+        return chatRoomRepository.findByMemberId(userId, pageable).map(chatRoomMapper::toChatRoomDTO);
     }
 }
