@@ -9,10 +9,14 @@ import com.ducle.chat_service.service.ChatRoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("${api.chat-rooms}")
@@ -24,6 +28,17 @@ public class ChatRoomController {
     public ResponseEntity<Void> createChatRoom(@RequestHeader("X-User-UserId") Long userId,
             @RequestBody @Valid ChatRoomDTO chatRoomDTO) {
         return ResponseEntity.created(chatRoomService.createChatRoom(userId, chatRoomDTO)).build();
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<ChatRoomDTO>> getChatRooms(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir
+    ) {
+
+        return ResponseEntity.ok(chatRoomService.getChatRooms(page, size, sortBy, sortDir));
     }
 
 }

@@ -23,11 +23,14 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "chat_rooms")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatRoom {
@@ -45,13 +48,11 @@ public class ChatRoom {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ChatRoomType type = ChatRoomType.PUBLIC; 
+    private ChatRoomType type;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ChatRoomStatus status = ChatRoomStatus.ACTIVE; 
-
-  
+    private ChatRoomStatus status;
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatRoomMember> users = new ArrayList<>();
