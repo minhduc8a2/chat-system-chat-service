@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
@@ -20,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class HeartBeatController {
-    private static final long HEARTBEAT_TTL_SECONDS = 15;
+    private static final long HEARTBEAT_TTL_SECONDS = 10;
     @Value("${server.id}")
     private String serverId;
 
@@ -34,10 +32,10 @@ public class HeartBeatController {
     public String receiveHeartbeat(Message<?> message) {
 
         Long userId = SessionUtils.getUserIdFromSession(message);
-        String key = String.format(keyFormat, serverId, userId);
+        String key = String.format(keyFormat, userId);
         log.info("Heartbeat----------------------------------");
         log.info(key);
-        redisTemplate.opsForValue().set(key, "online", HEARTBEAT_TTL_SECONDS, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(key, serverId, HEARTBEAT_TTL_SECONDS, TimeUnit.SECONDS);
         return "pong";
     }
 }

@@ -1,17 +1,15 @@
 package com.ducle.chat_service.controller;
 
-import java.security.Principal;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
-import com.ducle.chat_service.util.SessionUtils;
+import com.ducle.chat_service.service.PresenceService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,19 +20,12 @@ public class PresenceController {
     private String serverId;
     @Value("${presence.redis-key-format}")
     private String keyFormat;
-    private final StringRedisTemplate redisTemplate;
-    private final SimpMessagingTemplate messagingTemplate;
+
+    private final PresenceService presenceService;
 
     @MessageMapping("/presence/{userId}")
-    public void receiveHeartbeat(@DestinationVariable Long userId, Message<?> message) {
-        Long senderId = SessionUtils.getUserIdFromSession(message);
-        String key = String.format(keyFormat, serverId, userId);
-        Boolean isOnline = redisTemplate.hasKey(key);
-        String destination = "/queue/presence";
-
-        messagingTemplate.convertAndSendToUser(
-                senderId.toString(),
-                destination,
-                isOnline);
+    @SendToUser("/queue/presence/others")
+    public Map<String, Object> sendUserOnlineStatus(@DestinationVariable Long userId, Message<?> message) {
+        return presenceService.sendOnlineStatus(userId);
     }
 }

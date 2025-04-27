@@ -3,7 +3,6 @@ package com.ducle.chat_service.service;
 import java.time.Instant;
 
 import org.springframework.messaging.Message;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.ducle.chat_service.model.dto.ClientMessageDTO;

@@ -26,7 +26,6 @@ spring:
       port: 6379
   cache:
     type: redis
-  
 
 kafka-config:
   topic-name: chat-messages
@@ -49,7 +48,6 @@ api:
   chat-service: ${api.base-url}/chat
   chat-rooms: ${api.chat-service}/chat-rooms
 
-
 eureka:
   client:
     service-url:
@@ -58,4 +56,5 @@ eureka:
     prefer-ip-address: true
 
 presence:
-  redis-key-format: "presence:server:%s:user:%s"
+  redis-key-format: "presence:user:%s"
+  redis-key-format-for-extract-user-id: "presence:user:\\d+"
