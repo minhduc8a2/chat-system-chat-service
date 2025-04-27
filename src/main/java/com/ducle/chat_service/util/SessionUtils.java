@@ -11,4 +11,8 @@ public class SessionUtils {
         SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.wrap(message);
         return (Long) accessor.getSessionAttributes().get("userId");
     }
+
+    public static Long getUserIdFromSession(SimpMessageHeaderAccessor accessor) {
+        return (Long) accessor.getSessionAttributes().get("userId");
+    }
 }

@@ -58,3 +58,6 @@ eureka:
 presence:
   redis-key-format: "presence:user:%s"
   redis-key-format-for-extract-user-id: "presence:user:\\d+"
+
+auth-service:
+  name: "AUTH-SERVICE"

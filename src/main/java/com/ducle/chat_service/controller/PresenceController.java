@@ -28,4 +28,6 @@ public class PresenceController {
     public Map<String, Object> sendUserOnlineStatus(@DestinationVariable Long userId, Message<?> message) {
         return presenceService.sendOnlineStatus(userId);
     }
+
+  
 }

@@ -1,11 +1,10 @@
 package com.ducle.chat_service.controller;
 
 import java.util.concurrent.TimeUnit;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
@@ -29,9 +28,8 @@ public class HeartBeatController {
 
     @MessageMapping("/heartbeat")
     @SendToUser("/queue/heartbeatReply")
-    public String receiveHeartbeat(Message<?> message) {
-
-        Long userId = SessionUtils.getUserIdFromSession(message);
+    public String receiveHeartbeat(SimpMessageHeaderAccessor headerAccessor) {
+        Long userId = SessionUtils.getUserIdFromSession(headerAccessor);
         String key = String.format(keyFormat, userId);
         log.info("Heartbeat----------------------------------");
         log.info(key);
