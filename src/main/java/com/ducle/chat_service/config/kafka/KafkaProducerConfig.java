@@ -1,4 +1,4 @@
-package com.ducle.chat_service.config;
+package com.ducle.chat_service.config.kafka;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +26,7 @@ import lombok.Data;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "kafka-config")
-public class KafkaConfig {
+public class KafkaProducerConfig {
 
         @Value(value = "${spring.kafka.producer.bootstrap-servers}")
         private String bootstrapAddress;
@@ -50,13 +50,6 @@ public class KafkaConfig {
         }
 
         @Bean
-        public KafkaAdmin kafkaAdmin() {
-                Map<String, Object> configs = new HashMap<>();
-                configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
-                return new KafkaAdmin(configs);
-        }
-
-        @Bean
         public NewTopic chatTopic() {
                 return TopicBuilder.name(topicName)
                                 .partitions(partitions)
@@ -65,5 +58,8 @@ public class KafkaConfig {
                                 .config(TopicConfig.CLEANUP_POLICY_CONFIG, TopicConfig.CLEANUP_POLICY_DELETE)
                                 .build();
         }
+
+
+
 
 }

@@ -7,6 +7,9 @@ spring:
     config:
       enabled: false
   kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: chat-service-consumer-1
     producer:
       bootstrap-servers: localhost:9092
 
