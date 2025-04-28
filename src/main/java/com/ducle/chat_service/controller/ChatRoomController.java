@@ -3,14 +3,12 @@ package com.ducle.chat_service.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ducle.chat_service.exception.AccessDeniedException;
 import com.ducle.chat_service.model.dto.ChatRoomDTO;
 import com.ducle.chat_service.service.ChatRoomService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

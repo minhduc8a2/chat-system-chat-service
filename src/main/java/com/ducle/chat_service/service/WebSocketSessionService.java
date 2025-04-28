@@ -18,6 +18,7 @@ public class WebSocketSessionService {
 
         if (userId != null) {
             presenceService.setUserOnline(userId);
+            
             presenceService.sendOnlineStatus(userId, true);
 
             presenceService.setWebsocketConnectionStatus(userId, true);

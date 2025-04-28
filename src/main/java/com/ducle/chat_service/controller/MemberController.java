@@ -4,7 +4,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ducle.chat_service.model.dto.BasicUserInfoDTO;
-import com.ducle.chat_service.model.dto.ChatRoomMemberDTO;
 import com.ducle.chat_service.service.ChatRoomMemberService;
 
 import jakarta.validation.constraints.Min;

@@ -13,7 +13,9 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
+import com.ducle.chat_service.model.dto.CommandDTO;
 import com.ducle.chat_service.model.dto.MessageDTO;
+import com.ducle.chat_service.model.dto.UserPresenceDTO;
 
 @Configuration
 public class KafkaConsumerConfig {
@@ -32,9 +34,8 @@ public class KafkaConsumerConfig {
         return props;
     }
 
-    @Bean
-    public ConsumerFactory<String, MessageDTO> messageConsumerFactory() {
-        JsonDeserializer<MessageDTO> deserializer = new JsonDeserializer<>(MessageDTO.class);
+    private <T> ConsumerFactory<String, T> createConsumerFactory(Class<T> valueType) {
+        JsonDeserializer<T> deserializer = new JsonDeserializer<>(valueType);
         deserializer.setUseTypeMapperForKey(true);
         return new DefaultKafkaConsumerFactory<>(
                 configProperties(),
@@ -42,11 +43,24 @@ public class KafkaConsumerConfig {
                 deserializer);
     }
 
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, MessageDTO> messageKafkaListenerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, MessageDTO> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(messageConsumerFactory());
+    private <T> ConcurrentKafkaListenerContainerFactory<String, T> createKafkaListenerFactory(Class<T> valueType) {
+        ConcurrentKafkaListenerContainerFactory<String, T> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(createConsumerFactory(valueType));
         return factory;
     }
 
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, MessageDTO> messageKafkaListenerFactory() {
+        return createKafkaListenerFactory(MessageDTO.class);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, CommandDTO> commandKafkaListenerFactory() {
+        return createKafkaListenerFactory(CommandDTO.class);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, UserPresenceDTO> presenceKafkaListenerFactory() {
+        return createKafkaListenerFactory(UserPresenceDTO.class);
+    }
 }

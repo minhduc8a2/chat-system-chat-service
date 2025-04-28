@@ -32,6 +32,14 @@ kafka-config:
   chat-partitions: 3
   chat-replicas: 1
 
+  command-topic-name: command-messages
+  command-partitions: 3
+  command-replicas: 1
+
+  presence-topic-name: presence-messages
+  presence-partitions: 3
+  presence-replicas: 1
+
 server:
   port: 8084
   id: 0
@@ -60,7 +68,6 @@ presence:
 
 websocket-connection-status:
   redis-key-format: "websocket:user:%s"
-
 
 auth-service:
   name: "AUTH-SERVICE"

@@ -11,30 +11,45 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.ducle.chat_service.exception.EntityNotExistsException;
 import com.ducle.chat_service.mapper.ChatRoomMapper;
+import com.ducle.chat_service.model.dto.BasicUserInfoDTO;
 import com.ducle.chat_service.model.dto.ChatRoomDTO;
 import com.ducle.chat_service.model.entity.ChatRoom;
 import com.ducle.chat_service.model.entity.ChatRoomMember;
 import com.ducle.chat_service.model.enums.ChatRoomMemberRole;
 import com.ducle.chat_service.model.enums.ChatRoomSortField;
 import com.ducle.chat_service.model.enums.ChatRoomStatus;
+import com.ducle.chat_service.model.enums.CommandType;
+import com.ducle.chat_service.model.enums.MessageType;
 import com.ducle.chat_service.repository.ChatRoomMemberRepository;
 import com.ducle.chat_service.repository.ChatRoomRepository;
-import com.ducle.chat_service.security.ChatRoomSecurity;
 import com.ducle.chat_service.util.PaginationHelper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChatRoomService {
     @Value("${api.chat-rooms}")
     private String chatRoomApiUrl;
 
     private final ChatRoomRepository chatRoomRepository;
+
     private final ChatRoomMapper chatRoomMapper;
+
     private final ChatRoomMemberRepository chatRoomMemberRepository;
 
-    private final ChatRoomSecurity chatRoomSecurity;
+    private final ObjectMapper objectMapper;
+
+    private final MessageService messageService;
+
+    private final BasicUserInfoService basicUserInfoService;
+
+    private final DelayExecutorService delayExecutorService;
+
+    private final PresenceService presenceService;
 
     public URI createChatRoom(Long userId, ChatRoomDTO chatRoomDTO) {
         ChatRoom chatRoom = chatRoomMapper.toChatRoom(chatRoomDTO);
@@ -60,6 +75,21 @@ public class ChatRoomService {
 
         ChatRoomMember newMember = new ChatRoomMember(chatRoom, userId, ChatRoomMemberRole.MEMBER);
         chatRoomMemberRepository.save(newMember);
+
+        // send join message to chatroom
+        BasicUserInfoDTO userInfo = basicUserInfoService.getUserById(userId);
+        String content = "#".concat(userInfo.username()).concat(" has joined");
+        messageService.sendSystemMessageToChatroom(content, chatRoomId, MessageType.JOIN);
+
+        // notify through websocket
+        try {
+            String payload = objectMapper.writeValueAsString(userInfo);
+            messageService.sendCommandMessageToChatroom(payload, chatRoomId, CommandType.MEMBER_JOIN);
+            delayExecutorService.executeAfterDelay(
+                    () -> presenceService.sendOnlineStatus(userId, presenceService.getUserOnlineStatus(userId)), 3);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
 
     }
 
