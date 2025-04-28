@@ -28,9 +28,9 @@ spring:
     type: redis
 
 kafka-config:
-  topic-name: chat-messages
-  partitions: 3
-  replicas: 1
+  chat-topic-name: chat-messages
+  chat-partitions: 3
+  chat-replicas: 1
 
 server:
   port: 8084
@@ -61,3 +61,6 @@ presence:
 
 auth-service:
   name: "AUTH-SERVICE"
+
+notification-service:
+  name: "NOTIFICATION-SERVICE"

@@ -9,7 +9,7 @@ import com.ducle.chat_service.model.dto.MessageDTO;
 import com.ducle.chat_service.model.enums.MessageType;
 import com.ducle.chat_service.security.ChatRoomSecurity;
 import com.ducle.chat_service.service.id_generator.impl.Snowflake;
-import com.ducle.chat_service.service.queue_service.QueueProducerService;
+import com.ducle.chat_service.service.kafka.KafkaChatProducerService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class MessageService {
-    private final QueueProducerService queueService;
+    private final KafkaChatProducerService queueService;
     private final Snowflake snowflake;
 
     private final ChatRoomSecurity chatRoomSecurity;

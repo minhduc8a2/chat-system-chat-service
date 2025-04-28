@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 public class KafkaMessageConsumer {
     private final SimpMessagingTemplate messagingTemplate;
 
-    @KafkaListener(topics = "${kafka-config.topic-name}", containerFactory = "messageKafkaListenerFactory")
+    @KafkaListener(topics = "${kafka-config.chat-topic-name}", containerFactory = "messageKafkaListenerFactory")
     public void consume(MessageDTO message) {
         log.info("Message consumed: {}", message);
         messagingTemplate.convertAndSend("/topic/chat_room/" + message.roomId(), message);

@@ -7,6 +7,7 @@ import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import com.ducle.chat_service.service.PresenceService;
+import com.ducle.chat_service.service.WebSocketSessionService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,19 +17,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WebSocketEventListener {
 
-    private final PresenceService presenceService;
+    private final WebSocketSessionService webSocketSessionService;
 
     @EventListener
     public void handleWebSocketConnectListener(SessionConnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+        // tasks
+        webSocketSessionService.handleConnect(headerAccessor);
 
+        // log minimal info here
         Long userId = (Long) headerAccessor.getSessionAttributes().get("userId");
-        log.info("---------------------------------------");
-        log.info("User is connected: " + userId);
-
         if (userId != null) {
-            presenceService.setUserOnline(userId);
-            presenceService.sendOnlineStatus(userId, true);
+            System.out.println("User connected: " + userId);
         }
     }
 
@@ -36,9 +36,13 @@ public class WebSocketEventListener {
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
 
+        webSocketSessionService.handleDisconnect(headerAccessor);
+
+        // log minimal info here
         Long userId = (Long) headerAccessor.getSessionAttributes().get("userId");
-        log.info("---------------------------------------");
-        log.info("User is disconnected: " + userId);
+        if (userId != null) {
+            System.out.println("User disconnected: " + userId);
+        }
 
     }
 }

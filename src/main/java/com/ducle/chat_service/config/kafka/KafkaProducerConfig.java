@@ -29,9 +29,10 @@ public class KafkaProducerConfig {
         @Value(value = "${spring.kafka.producer.bootstrap-servers}")
         private String bootstrapAddress;
 
-        private String topicName;
-        private int partitions;
-        private int replicas;
+        private String chatTopicName;
+        private String notificationTopicName;
+        private int chatPartitions;
+        private int chatReplicas;
 
         @Bean
         public ProducerFactory<String, MessageDTO> producerFactory() {
@@ -49,15 +50,12 @@ public class KafkaProducerConfig {
 
         @Bean
         public NewTopic chatTopic() {
-                return TopicBuilder.name(topicName)
-                                .partitions(partitions)
-                                .replicas(replicas)
+                return TopicBuilder.name(chatTopicName)
+                                .partitions(chatPartitions)
+                                .replicas(chatReplicas)
                                 .config(TopicConfig.RETENTION_MS_CONFIG, "604800000")
                                 .config(TopicConfig.CLEANUP_POLICY_CONFIG, TopicConfig.CLEANUP_POLICY_DELETE)
                                 .build();
         }
-
-
-
 
 }
