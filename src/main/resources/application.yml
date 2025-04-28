@@ -57,7 +57,10 @@ eureka:
 
 presence:
   redis-key-format: "presence:user:%s"
-  redis-key-format-for-extract-user-id: "presence:user:\\d+"
+
+websocket-connection-status:
+  redis-key-format: "websocket:user:%s"
+
 
 auth-service:
   name: "AUTH-SERVICE"

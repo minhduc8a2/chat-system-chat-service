@@ -12,6 +12,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import com.ducle.chat_service.model.dto.UserPresenceDTO;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,10 +23,15 @@ import lombok.extern.slf4j.Slf4j;
 public class PresenceService {
     private static final long HEARTBEAT_TTL_SECONDS = 10;
     private static final String ONLINE_STATUS_DESTIONATION = "/topic/presence";
+
     @Value("${server.id}")
     private String serverId;
+
     @Value("${presence.redis-key-format}")
     private String keyFormat;
+
+    @Value("${websocket-connection-status.redis-key-format}")
+    private String websocketConnectionKeyFormat;
 
     private final StringRedisTemplate redisTemplate;
     private final SimpMessagingTemplate messagingTemplate;
@@ -69,6 +76,26 @@ public class PresenceService {
         log.info("Heartbeat----------------------------------");
         log.info(key);
         redisTemplate.opsForValue().set(key, serverId, HEARTBEAT_TTL_SECONDS, TimeUnit.SECONDS);
+    }
+
+
+
+    public void setWebsocketConnectionStatus(Long userId, boolean isConnected) {
+        String key = String.format(websocketConnectionKeyFormat, userId);
+
+        if (isConnected) {
+            log.info("Websocket connection established: {}", key);
+            redisTemplate.opsForValue().set(key, serverId);
+        } else {
+            redisTemplate.delete(key);
+            log.info("Websocket disconnection: {}", key);
+
+        }
+    }
+
+
+    public List<UserPresenceDTO> getChatRoomWebsocketConnectionStatusList(Long chatRoomId){
+        return
     }
 
 }

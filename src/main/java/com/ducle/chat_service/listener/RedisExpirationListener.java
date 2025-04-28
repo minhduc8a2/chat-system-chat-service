@@ -17,8 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class RedisExpirationListener {
-    @Value("${presence.redis-key-format-for-extract-user-id}")
-    private String keyExtractFormat;
 
     private final PresenceService presenceService;
 
