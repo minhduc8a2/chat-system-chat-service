@@ -10,6 +10,7 @@ import com.ducle.chat_service.service.ChatRoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,16 +42,15 @@ public class ChatRoomController {
         return ResponseEntity.ok(chatRoomService.getChatRooms(page, size, sortBy, sortDir));
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/user")
     public ResponseEntity<Page<ChatRoomDTO>> getChatRooms(
-            @PathVariable Long id,
             @RequestHeader("X-User-UserId") Long userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir) {
 
-        return ResponseEntity.ok(chatRoomService.getChatRoomsForUser(id, userId, page, size, sortBy, sortDir));
+        return ResponseEntity.ok(chatRoomService.getChatRoomsForUser(userId, page, size, sortBy, sortDir));
     }
 
     @PostMapping("/join/{id}")

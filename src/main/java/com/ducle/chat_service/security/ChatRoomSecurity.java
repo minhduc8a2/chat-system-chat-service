@@ -7,23 +7,18 @@ import com.ducle.chat_service.exception.AccessDeniedException;
 import com.ducle.chat_service.util.SessionUtils;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ChatRoomSecurity {
     private final RoomAccessChecker checker;
 
-    public void ensureAccessToRoom(Message<?> fullMessage, Long chatroomId) {
-
-        Long userId = SessionUtils.getUserIdFromSession(fullMessage);
-        if (!checker.hasAccess(userId, chatroomId)) {
-            throw new AccessDeniedException("User not allowed to chat in this room");
-        }
-
-    }
-
-    public void ensureToGetJoinedRooms(Long id, Long userId) {
-        if (!id.equals(userId)) {
+    public void ensureAccessToRoom(Long userId, Long chatroomId) {
+        boolean check = checker.hasAccess(userId, chatroomId);
+        log.info("Check : " + check);
+        if (!check) {
             throw new AccessDeniedException("User not allowed to chat in this room");
         }
 

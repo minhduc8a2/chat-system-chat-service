@@ -3,6 +3,7 @@ package com.ducle.chat_service.service;
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,7 @@ public class ChatRoomService {
                 .toUri();
     }
 
+    @CacheEvict(value = "room-access", key = "#userId + '-' + #chatroomId")
     public void joinRoom(Long userId, Long chatRoomId) {
         if (chatRoomMemberRepository.existsByChatRoomIdAndMemberId(chatRoomId, userId)) {
             throw new IllegalArgumentException("User is already a member of this chat room.");
@@ -67,10 +69,9 @@ public class ChatRoomService {
         return chatRoomRepository.findAll(pageable).map(chatRoomMapper::toChatRoomDTO);
     }
 
-    public Page<ChatRoomDTO> getChatRoomsForUser(Long id, Long userId, int page, int size, String sortBy,
+    public Page<ChatRoomDTO> getChatRoomsForUser(Long userId, int page, int size, String sortBy,
             String sortDir) {
 
-        chatRoomSecurity.ensureToGetJoinedRooms(id, userId);
         Pageable pageable = PaginationHelper.generatePageable(page, size, sortBy, sortDir, ChatRoomSortField.class);
         return chatRoomRepository.findByMemberId(userId, pageable).map(chatRoomMapper::toChatRoomDTO);
     }

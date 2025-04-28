@@ -1,7 +1,5 @@
 package com.ducle.chat_service.listener;
 
-
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.MessageListener;
@@ -37,9 +35,10 @@ public class RedisExpirationListener {
         return (message, pattern) -> {
             String key = message.toString();
             log.info("Key expired: " + key);
-            if (key.startsWith("presence.")) {
+            if (key.startsWith("presence")) {
                 Long userId = Long.valueOf(extractUserId(key));
                 presenceService.sendOnlineStatus(userId, false);
+                log.info("Send offline status for user: " + userId);
             }
         };
     }

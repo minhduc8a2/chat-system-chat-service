@@ -12,25 +12,37 @@ import com.ducle.chat_service.security.ChatRoomSecurity;
 import com.ducle.chat_service.util.PaginationHelper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChatRoomMemberService {
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final ChatRoomSecurity chatRoomSecurity;
     private final BasicUserInfoService basicUserInfoService;
+    private final PresenceService presenceService;
 
-    public Page<BasicUserInfoDTO> getChatRoomMembers(Long id, Long userId, int page, int size, String sortBy,
+    public Page<BasicUserInfoDTO> getChatRoomMembers(Long chatRoomId, Long userId, int page, int size, String sortBy,
             String sortDir) {
-
-        chatRoomSecurity.ensureToGetJoinedRooms(id, userId);
+        chatRoomSecurity.ensureAccessToRoom(userId, chatRoomId);
         Pageable pageable = PaginationHelper.generatePageable(page, size, sortBy, sortDir,
                 ChatRoomMemberSortField.class);
 
-        var memberIdPage = chatRoomMemberRepository.findAllMemberIdByChatRoomId(id, pageable);
-        var userInfoList = basicUserInfoService.getUsersByIds(memberIdPage.getContent());
+        var memberIdPage = chatRoomMemberRepository.findAllMemberIdByChatRoomId(chatRoomId, pageable);
 
-        return new PageImpl<>(userInfoList, pageable, memberIdPage.getTotalElements());
+        var memberIds = memberIdPage.getContent();
+        var userInfoList = basicUserInfoService.getUsersByIds(memberIds);
 
+        var userOnlineStatusMap = presenceService.getUsersOnlineStatus(memberIds);
+
+        var onlineStatusUpdatedUserInfoList = userInfoList.stream()
+                .map(userInfo -> new BasicUserInfoDTO(
+                        userInfo.id(),
+                        userInfo.username(),
+                        userOnlineStatusMap.getOrDefault(userInfo.id(), false)))
+                .toList();
+        return new PageImpl<>(onlineStatusUpdatedUserInfoList, pageable, memberIdPage.getTotalElements());
     }
+
 }
