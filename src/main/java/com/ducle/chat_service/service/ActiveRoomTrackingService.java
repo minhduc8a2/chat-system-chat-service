@@ -5,6 +5,10 @@ import java.time.Instant;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.ducle.chat_service.exception.EntityNotExistsException;
+import com.ducle.chat_service.model.entity.ChatRoomMember;
+import com.ducle.chat_service.repository.ChatRoomMemberRepository;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -14,6 +18,7 @@ public class ActiveRoomTrackingService {
     private final StringRedisTemplate redisTemplate;
 
     private final ChatRoomMemberService chatRoomMemberService;
+    private final ChatRoomMemberRepository chatRoomMemberRepository;
 
     private String generateKey(Long userId) {
         return String.format(ROOM_TRACKING_KEY_FORMAT, userId);
@@ -35,5 +40,11 @@ public class ActiveRoomTrackingService {
 
     public void updateLastSeenTimeStamp(Long chatRoomId, Long userId) {
         chatRoomMemberService.updateLastSeenTimeStamp(chatRoomId, userId, Instant.now());
+    }
+
+    public Instant getRoomLastSeenTimeStamp(Long chatRoomId, Long userId) {
+        ChatRoomMember member = chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, userId)
+                .orElseThrow(() -> new EntityNotExistsException("User not found"));
+        return member.getLastSeen();
     }
 }

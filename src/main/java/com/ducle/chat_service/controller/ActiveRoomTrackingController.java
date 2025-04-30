@@ -1,5 +1,7 @@
 package com.ducle.chat_service.controller;
 
+import java.time.Instant;
+
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -10,6 +12,10 @@ import com.ducle.chat_service.util.SessionUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,4 +33,11 @@ public class ActiveRoomTrackingController {
         activeRoomTrackingService.updateLastSeenTimeStamp(chatroomId, userId);
 
     }
+
+    @GetMapping("/internal/chat/room_last_seen")    
+    @ResponseBody
+    Instant getRoomLastSeenTimeStamp(@RequestParam Long chatRoomId, @RequestParam Long userId) {
+        return activeRoomTrackingService.getRoomLastSeenTimeStamp(chatRoomId, userId);
+    }
+
 }
