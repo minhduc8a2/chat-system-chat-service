@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import com.ducle.chat_service.service.ActiveRoomTrackingService;
 import com.ducle.chat_service.service.PresenceService;
 import com.ducle.chat_service.service.WebSocketSessionService;
 
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 public class WebSocketEventListener {
 
     private final WebSocketSessionService webSocketSessionService;
+    private final ActiveRoomTrackingService activeRoomTrackingService;
 
     @EventListener
     public void handleWebSocketConnectListener(SessionConnectEvent event) {
@@ -28,7 +30,7 @@ public class WebSocketEventListener {
         // log minimal info here
         Long userId = (Long) headerAccessor.getSessionAttributes().get("userId");
         if (userId != null) {
-            System.out.println("User connected: " + userId);
+            log.info("User connected: " + userId);
         }
     }
 
@@ -41,7 +43,13 @@ public class WebSocketEventListener {
         // log minimal info here
         Long userId = (Long) headerAccessor.getSessionAttributes().get("userId");
         if (userId != null) {
-            System.out.println("User disconnected: " + userId);
+            log.info("User disconnected: " + userId);
+            Long chatRoomId = activeRoomTrackingService.getActiveRoom(userId);
+
+            if (chatRoomId != null) {
+                activeRoomTrackingService.clearActiveRoom(userId);
+                activeRoomTrackingService.updateLastSeenTimeStamp(chatRoomId, userId);
+            }
         }
 
     }

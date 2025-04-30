@@ -1,5 +1,7 @@
 package com.ducle.chat_service.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,4 +21,6 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
                 WHERE crm.chatRoom.id = :chatRoomId
             """)
     Page<Long> findAllMemberIdByChatRoomId(@Param("chatRoomId") Long chatRoomId, Pageable pageable);
+
+    Optional<ChatRoomMember> findByChatRoomIdAndMemberId(Long chatRoomId, Long memberId);
 }

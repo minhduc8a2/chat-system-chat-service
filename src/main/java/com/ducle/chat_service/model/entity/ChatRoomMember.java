@@ -1,5 +1,7 @@
 package com.ducle.chat_service.model.entity;
 
+import java.time.Instant;
+
 import com.ducle.chat_service.model.enums.ChatRoomMemberRole;
 
 import jakarta.persistence.Column;
@@ -40,6 +42,9 @@ public class ChatRoomMember {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ChatRoomMemberRole role;
+
+    @Column(nullable = true)
+    private Instant lastSeen;
 
     public ChatRoomMember(ChatRoom chatRoom, Long memberId, ChatRoomMemberRole role) {
         this.id = null;

@@ -58,7 +58,7 @@ public class ChatRoomService {
 
         ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
 
-        ChatRoomMember member = new ChatRoomMember(null, savedChatRoom, userId, ChatRoomMemberRole.MANAGER);
+        ChatRoomMember member = new ChatRoomMember(null, savedChatRoom, userId, ChatRoomMemberRole.MANAGER, null);
         chatRoomMemberRepository.save(member);
 
         return UriComponentsBuilder.fromUriString(chatRoomApiUrl + "/{id}").buildAndExpand(savedChatRoom.getId())
