@@ -51,6 +51,7 @@ public class ChatRoomMember {
         this.chatRoom = chatRoom;
         this.memberId = memberId;
         this.role = role;
+        this.lastSeen = Instant.now();
     }
 
 }
