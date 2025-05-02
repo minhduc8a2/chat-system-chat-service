@@ -76,17 +76,20 @@ public class ChatRoomService {
         ChatRoomMember newMember = new ChatRoomMember(chatRoom, userId, ChatRoomMemberRole.MEMBER);
         chatRoomMemberRepository.save(newMember);
 
-        // send join message to chatroom
         BasicUserInfoDTO userInfo = basicUserInfoService.getUserById(userId);
-        String content = "#".concat(userInfo.username()).concat(" has joined");
-        messageService.sendSystemMessageToChatroom(content, chatRoomId, MessageType.JOIN);
 
         // notify through websocket
         try {
             String payload = objectMapper.writeValueAsString(userInfo);
             messageService.sendCommandMessageToChatroom(payload, chatRoomId, CommandType.MEMBER_JOIN);
             delayExecutorService.executeAfterDelay(
-                    () -> presenceService.sendOnlineStatus(userId, presenceService.getUserOnlineStatus(userId)), 3);
+                    () -> {
+                        // send join message to chatroom
+                        String content = "#".concat(userInfo.username()).concat(" has joined");
+                        messageService.sendSystemMessageToChatroom(content, chatRoomId, MessageType.JOIN);
+                        // send online status
+                        presenceService.sendOnlineStatus(userId, presenceService.getUserOnlineStatus(userId));
+                    }, 3);
         } catch (Exception e) {
             log.error(e.getMessage());
         }
