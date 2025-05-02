@@ -50,9 +50,10 @@ public class PresenceService {
         messageService.sendUserPresenceToUserTopic(userId, isOnline);
     }
 
-    public Boolean getUserOnlineStatus(Long userId) {
+    public boolean getUserOnlineStatus(Long userId) {
         String key = String.format(keyFormat, userId);
-        return redisTemplate.hasKey(key);
+        Boolean result =  redisTemplate.hasKey(key);
+        return result!=null && result;
     }
 
     public Map<Long, Boolean> getUsersOnlineStatus(List<Long> userIds) {
